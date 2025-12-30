@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/expense_tracker
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+
+app:
+  jwt:
+    # IMPORTANT : en HS256 il faut une clé assez longue (>= 32 chars)
+    secret: "0123456789abcdef0123456789abcdef"
+    expirationMinutes: 60
