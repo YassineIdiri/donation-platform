@@ -51,6 +51,12 @@ Expense Tracker isn't just another CRUD app. It is an **expense tracking SaaS** 
   </table>
 </div>
 
+### 📱 Responsive & Modern
+| Desktop Experience | Mobile Friendly |
+|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/7ad7a120-1b7d-4968-baba-7bc87d6c9c98" alt="Desktop View" width="100%" /> | <img src="https://github.com/user-attachments/assets/a7c4dae3-1b76-4295-a3cc-7077e5c5b30c" alt="mobile" width="100%" /> |
+
+
 ### 📊 Analytics & Insights
 | Financial Dashboard | Distribution & Trends |
 |:---:|:---:|
