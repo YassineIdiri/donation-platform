@@ -63,7 +63,7 @@ This project was built as a **production-ready SaaS foundation**, not a demo or 
 
 | Categories | Expenses |
 |---|---|
-| <img width="1895" height="938" alt="cate" src="https://github.com/user-attachments/assets/cc063340-7e25-4824-a69f-be914c39e4ec" /> | <img width="1895" height="938" alt="exp" src="https://github.com/user-attachments assets/73c0a25a-3094-47cb-843e-84e2ef568775" /> |
+| <img width="1895" height="938" alt="cate" src="https://github.com/user-attachments/assets/cc063340-7e25-4824-a69f-be914c39e4ec" /> | <img width="1895" height="938" alt="exp" src="https://github.com/user-attachments/assets/7ad7a120-1b7d-4968-baba-7bc87d6c9c98" /> |
 
 ---
 
