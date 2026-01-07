@@ -6,7 +6,11 @@
 ---
 
 ## 🖥️ Product Preview
+<img width="1895" height="938" alt="home" src="https://github.com/user-attachments/assets/1fa9ea02-eefd-4c8a-b5a2-461fee46021b" />
+
 <img width="1895" height="938" alt="dash1" src="https://github.com/user-attachments/assets/6b9944eb-538a-46db-8678-49008ffd9348" />
+
+<img width="1895" height="938" alt="cate" src="https://github.com/user-attachments/assets/cc063340-7e25-4824-a69f-be914c39e4ec" />
 
 ---
 
