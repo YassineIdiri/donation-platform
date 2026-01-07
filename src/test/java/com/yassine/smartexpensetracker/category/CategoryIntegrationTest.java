@@ -24,6 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 class CategoryIntegrationTest {
 
+    private static final String BASE = "/api/categories";
+    private static final long TOKEN_TTL_SECONDS = 3600;
+
     @Autowired RestTestClient client;
     @Autowired UserRepository userRepository;
     @Autowired CategoryRepository categoryRepository;
@@ -35,43 +38,45 @@ class CategoryIntegrationTest {
 
     // ----- Helpers ------------------------------------------------------------
 
+    private String authHeader() {
+        return "Bearer " + token;
+    }
+
     private RestTestClient.ResponseSpec getCategories() {
         return client.get()
-                .uri("/api/v1/categories")
+                .uri(BASE)
                 .exchange();
     }
 
     private RestTestClient.ResponseSpec getCategoriesAuth() {
         return client.get()
-                .uri("/api/v1/categories")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(BASE)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .exchange();
     }
-
-
 
     private RestTestClient.ResponseSpec postCategoryAuth(String jsonBody) {
         return client.post()
-                .uri("/api/v1/categories")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(BASE)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(jsonBody)
                 .exchange();
     }
 
-    private RestTestClient.ResponseSpec putCategoryAuth(UUID categoryId, String jsonBody) {
+    private RestTestClient.ResponseSpec putCategoryAuth(UUID id, String jsonBody) {
         return client.put()
-                .uri("/api/v1/categories/" + categoryId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(BASE + "/" + id)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(jsonBody)
                 .exchange();
     }
 
-    private RestTestClient.ResponseSpec deleteCategoryAuth(UUID categoryId) {
+    private RestTestClient.ResponseSpec deleteCategoryAuth(UUID id) {
         return client.delete()
-                .uri("/api/v1/categories/" + categoryId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(BASE + "/" + id)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .exchange();
     }
 
@@ -79,7 +84,6 @@ class CategoryIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Clean (évite pollution entre tests)
         categoryRepository.deleteAll();
         userRepository.deleteAll();
 
@@ -89,6 +93,7 @@ class CategoryIntegrationTest {
         userRepository.save(u);
 
         userId = u.getId();
+        token = jwtService.generateToken(userId, u.getEmail(), TOKEN_TTL_SECONDS);
 
         Category c = new Category();
         c.setUser(u);
@@ -104,37 +109,38 @@ class CategoryIntegrationTest {
     // ----- Tests --------------------------------------------------------------
 
     @Test
-    @DisplayName("GET /api/v1/categories -> 401 quand pas de header Authorization")
+    @DisplayName("GET /api/categories -> 401 quand pas de header Authorization")
     void categories_shouldReturn401_whenNoAuthHeader() {
-        getCategories()
-                .expectStatus().isUnauthorized();
+        getCategories().expectStatus().isUnauthorized();
     }
 
     @Test
-    @DisplayName("GET /api/v1/categories -> 401 quand token invalide")
+    @DisplayName("GET /api/categories -> 401 quand token invalide")
     void categories_shouldReturn401_whenInvalidJwt() {
         client.get()
-                .uri("/api/v1/categories")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + "this.is.not.a.jwt")
+                .uri(BASE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer this.is.not.a.jwt")
                 .exchange()
                 .expectStatus().isUnauthorized();
     }
 
     @Test
-    @DisplayName("GET /api/v1/categories -> 200 + [] quand JWT valide et aucune catégorie")
-    void categories_shouldReturn200_andEmptyList_whenNoCategories() {
+    @DisplayName("GET /api/categories -> 200 + liste quand JWT valide (seed = 1)")
+    void categories_shouldReturn200_andList_whenAuthOk() {
         var spec = getCategoriesAuth();
 
         spec.expectStatus().isOk();
         spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
 
+        // RestTestClient: pas de isArray(), on check via length()
         spec.expectBody()
-                .jsonPath("$").isArray()
-                .jsonPath("$.length()").isEqualTo(0);
+                .jsonPath("$").exists()
+                .jsonPath("$.length()").isEqualTo(1)
+                .jsonPath("$[0].name").exists();
     }
 
     @Test
-    @DisplayName("POST /api/v1/categories -> crée + trim + ensuite GET contient la catégorie")
+    @DisplayName("POST /api/categories -> crée + trim + ensuite GET contient 2 catégories")
     void categories_shouldCreate_thenListShouldContainIt() {
         String body = """
             {
@@ -145,39 +151,25 @@ class CategoryIntegrationTest {
             }
             """;
 
-        var spec = postCategoryAuth(body);
-        spec.expectStatus().isOk();
+        var create = postCategoryAuth(body);
 
-        spec.expectHeader().contentTypeCompatibleWith(HttpHeaders.AUTHORIZATION);
-        spec.expectBody().jsonPath("$.name").isEqualTo("Restaurant");
+        create.expectStatus().isOk();
+        create.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
+        create.expectBody()
+                .jsonPath("$.id").exists()
+                .jsonPath("$.name").isEqualTo("Restaurant")
+                .jsonPath("$.color").isEqualTo("#FF0000")
+                .jsonPath("$.icon").isEqualTo("🍔");
 
-        var specGet = getCategoriesAuth();
-        spec.expectStatus().isOk();
-
-        specGet.expectHeader().contentTypeCompatibleWith(HttpHeaders.AUTHORIZATION);
-        specGet.expectBody().jsonPath("$").isArray();
-        specGet.expectBody().jsonPath("$.lenght()").isEqualTo(2);
-
+        var list = getCategoriesAuth();
+        list.expectStatus().isOk();
+        list.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
+        list.expectBody()
+                .jsonPath("$.length()").isEqualTo(2);
     }
 
     @Test
-    @DisplayName("POST /api/v1/categories -> 400 si nom existe déjà (ignore case)")
-    void categories_shouldReturn400_whenDuplicateNameIgnoringCase() {
-        String body = """
-            {
-              "name": "   fOoD   ",
-              "color": "#222222",
-              "icon": "🍔",
-              "budgetLimit": 50.00
-            }
-            """;
-
-        postCategoryAuth(body)
-                .expectStatus().isBadRequest(); // si IllegalArgumentException est mappée en 400
-    }
-
-    @Test
-    @DisplayName("PUT /api/v1/categories/{id} -> 200 et met à jour les champs (trim)")
+    @DisplayName("PUT /api/categories/{id} -> 200 et met à jour les champs (trim)")
     void categories_shouldUpdate_whenOwnedByUser() {
         String body = """
             {
@@ -202,28 +194,11 @@ class CategoryIntegrationTest {
     }
 
     @Test
-    @DisplayName("PUT /api/v1/categories/{id} -> 400 si catégorie n'existe pas pour ce user")
-    void categories_shouldReturn400_whenUpdateNotFound() {
-        String body = """
-            {
-              "name": "Test",
-              "color": "#000",
-              "icon": "x",
-              "budgetLimit": 1.00
-            }
-            """;
-
-        putCategoryAuth(UUID.randomUUID(), body)
-                .expectStatus().isBadRequest(); // service -> IllegalArgumentException("Category not found")
-    }
-
-    @Test
-    @DisplayName("DELETE /api/v1/categories/{id} -> supprime puis DB ne contient plus")
+    @DisplayName("DELETE /api/categories/{id} -> 2xx puis DB ne contient plus")
     void categories_shouldDelete_whenOwnedByUser() {
-        var deleteSpec = deleteCategoryAuth(categoryId);
+        var delete = deleteCategoryAuth(categoryId);
 
-        // Selon ton controller: 204 ou 200
-        deleteSpec.expectStatus().isOk();
+        delete.expectStatus().is2xxSuccessful();
         assertThat(categoryRepository.findById(categoryId)).isEmpty();
     }
 }

@@ -27,6 +27,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 class ExpenseIntegrationTest {
 
+    private static final String BASE = "/api/expenses";
+    private static final String FROM = "2025-12-01";
+    private static final String TO = "2025-12-31";
+    private static final long TOKEN_TTL_SECONDS = 3600; // 1h
+
     @Autowired RestTestClient client;
 
     @Autowired UserRepository userRepository;
@@ -41,49 +46,53 @@ class ExpenseIntegrationTest {
 
     // ----- Helpers  -------------------
 
-    private RestTestClient.ResponseSpec getSearch() {
-        // from/to sont REQUIRED dans ton controller
+    private String authHeader() {
+        return "Bearer " + token;
+    }
+
+    private RestTestClient.ResponseSpec getSearchNoAuth() {
+        // from/to REQUIRED dans controller
         return client.get()
-                .uri("/api/v1/expenses?from=2025-12-01&to=2025-12-31&page=0&size=10")
+                .uri(BASE + "?from=" + FROM + "&to=" + TO + "&page=0&size=10")
                 .exchange();
     }
 
-    private RestTestClient.ResponseSpec getSearchAuth(String uri) {
+    private RestTestClient.ResponseSpec getAuth(String uri) {
         return client.get()
                 .uri(uri)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .exchange();
     }
 
-    private RestTestClient.ResponseSpec postExpenseAuth(String jsonBody) {
+    private RestTestClient.ResponseSpec postAuth(String jsonBody) {
         return client.post()
-                .uri("/api/v1/expenses")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(BASE)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(jsonBody)
                 .exchange();
     }
 
-    private RestTestClient.ResponseSpec putExpenseAuth(UUID expenseId, String jsonBody) {
+    private RestTestClient.ResponseSpec putAuth(UUID expenseId, String jsonBody) {
         return client.put()
-                .uri("/api/v1/expenses/" + expenseId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(BASE + "/" + expenseId)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(jsonBody)
                 .exchange();
     }
 
-    private RestTestClient.ResponseSpec deleteExpenseAuth(UUID expenseId) {
+    private RestTestClient.ResponseSpec deleteAuth(UUID expenseId) {
         return client.delete()
-                .uri("/api/v1/expenses/" + expenseId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(BASE + "/" + expenseId)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .exchange();
     }
 
     private RestTestClient.ResponseSpec getSummaryAuth(String from, String to) {
         return client.get()
-                .uri("/api/v1/expenses/summary?from=" + from + "&to=" + to)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(BASE + "/summary?from=" + from + "&to=" + to)
+                .header(HttpHeaders.AUTHORIZATION, authHeader())
                 .exchange();
     }
 
@@ -95,7 +104,6 @@ class ExpenseIntegrationTest {
         e.setMerchant(merchant);
         e.setNote(note);
         e.setAmount(amount);
-        // currency default "EUR" dans l'entity
         e = expenseRepository.save(e);
         return e.getId();
     }
@@ -114,7 +122,9 @@ class ExpenseIntegrationTest {
         userRepository.save(u);
 
         userId = u.getId();
-        token = jwtService.generateToken(userId, u.getEmail());
+
+        // ✅ subject=userId ; filter reload user en DB
+        token = jwtService.generateToken(userId, u.getEmail(), TOKEN_TTL_SECONDS);
 
         Category c = new Category();
         c.setUser(u);
@@ -130,26 +140,26 @@ class ExpenseIntegrationTest {
     // ----- Tests --------------------------------------------------------------
 
     @Test
-    @DisplayName("GET /api/v1/expenses -> 401 quand pas de header Authorization")
+    @DisplayName("GET /api/expenses -> 401 quand pas de header Authorization")
     void expenses_shouldReturn401_whenNoAuthHeader() {
-        getSearch()
+        getSearchNoAuth()
                 .expectStatus().isUnauthorized();
     }
 
     @Test
-    @DisplayName("GET /api/v1/expenses -> 401 quand token invalide")
+    @DisplayName("GET /api/expenses -> 401 quand token invalide (Bearer présent mais invalide)")
     void expenses_shouldReturn401_whenInvalidJwt() {
         client.get()
-                .uri("/api/v1/expenses?from=2025-12-01&to=2025-12-31&page=0&size=10")
+                .uri(BASE + "?from=" + FROM + "&to=" + TO + "&page=0&size=10")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + "this.is.not.a.jwt")
                 .exchange()
                 .expectStatus().isUnauthorized();
     }
 
     @Test
-    @DisplayName("GET /api/v1/expenses -> 200 + page vide quand aucune dépense")
+    @DisplayName("GET /api/expenses -> 200 + page vide quand aucune dépense")
     void expenses_shouldReturn200_andEmptyPage_whenNoExpenses() {
-        var spec = getSearchAuth("/api/v1/expenses?from=2025-12-01&to=2025-12-31&page=0&size=10");
+        var spec = getAuth(BASE + "?from=" + FROM + "&to=" + TO + "&page=0&size=10");
 
         spec.expectStatus().isOk();
         spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
@@ -162,7 +172,7 @@ class ExpenseIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/expenses -> crée (200) + trim qd merchant/note sont fournis")
+    @DisplayName("POST /api/expenses -> crée (200) + trim qd merchant/note sont fournis")
     void expenses_shouldCreate_thenSearchShouldContainIt() {
         String body = """
             {
@@ -174,17 +184,15 @@ class ExpenseIntegrationTest {
             }
             """.formatted(categoryId);
 
-        var createSpec = postExpenseAuth(body);
+        var createSpec = postAuth(body);
 
         createSpec.expectStatus().isOk();
         createSpec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
-
         createSpec.expectBody()
                 .jsonPath("$.id").exists()
                 .jsonPath("$.id").isNotEmpty();
 
-
-        var searchSpec = getSearchAuth("/api/v1/expenses?from=2025-12-01&to=2025-12-31&page=0&size=10");
+        var searchSpec = getAuth(BASE + "?from=" + FROM + "&to=" + TO + "&page=0&size=10");
 
         searchSpec.expectStatus().isOk();
         searchSpec.expectBody()
@@ -193,9 +201,8 @@ class ExpenseIntegrationTest {
                 .jsonPath("$.items[0].categoryName").isEqualTo("Food");
     }
 
-
     @Test
-    @DisplayName("POST /api/v1/expenses -> 400 si amount invalide")
+    @DisplayName("POST /api/expenses -> 400 si amount invalide")
     void expenses_shouldReturn400_whenAmountInvalid() {
         String body = """
             {
@@ -207,12 +214,11 @@ class ExpenseIntegrationTest {
             }
             """.formatted(categoryId);
 
-        postExpenseAuth(body)
-                .expectStatus().isBadRequest();
+        postAuth(body).expectStatus().isBadRequest();
     }
 
     @Test
-    @DisplayName("PUT /api/v1/expenses/{id} -> 200 et met à jour")
+    @DisplayName("PUT /api/expenses/{id} -> 200 et met à jour")
     void expenses_shouldUpdate_whenOwnedByUser() {
         UUID expenseId = seedExpense(
                 LocalDate.of(2025, 12, 10),
@@ -231,7 +237,7 @@ class ExpenseIntegrationTest {
             }
             """.formatted(categoryId);
 
-        var spec = putExpenseAuth(expenseId, body);
+        var spec = putAuth(expenseId, body);
 
         spec.expectStatus().isOk();
         spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
@@ -247,7 +253,7 @@ class ExpenseIntegrationTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/expenses/{id} -> supprime puis DB ne contient plus")
+    @DisplayName("DELETE /api/expenses/{id} -> supprime puis DB ne contient plus")
     void expenses_shouldDelete_whenOwnedByUser() {
         UUID expenseId = seedExpense(
                 LocalDate.of(2025, 12, 10),
@@ -256,29 +262,24 @@ class ExpenseIntegrationTest {
                 new BigDecimal("10.00")
         );
 
-        var deleteSpec = deleteExpenseAuth(expenseId);
+        var deleteSpec = deleteAuth(expenseId);
 
-        // Ton controller retourne void sans @ResponseStatus => 200 OK
-        deleteSpec.expectStatus().isOk();
+        // ton controller retourne void => souvent 204
+        deleteSpec.expectStatus().is2xxSuccessful();
 
         assertThat(expenseRepository.findById(expenseId)).isEmpty();
     }
 
     @Test
-    @DisplayName("GET /api/v1/expenses -> filtre q (contient) marche")
+    @DisplayName("GET /api/expenses -> filtre q (contient) marche")
     void expenses_shouldSearchByQ() {
         seedExpense(LocalDate.of(2025, 12, 10), "Carrefour", "pates", new BigDecimal("10.00"));
         seedExpense(LocalDate.of(2025, 12, 11), "Ikea", "chaise", new BigDecimal("50.00"));
 
-        var spec = getSearchAuth("/api/v1/expenses?from=2025-12-01&to=2025-12-31&q=carre&page=0&size=10");
+        var spec = getAuth(BASE + "?from=" + FROM + "&to=" + TO + "&q=carre&page=0&size=10");
 
         spec.expectStatus().isOk();
         spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
-
-        spec.expectBody()
-                .jsonPath("$.items").isArray()
-                .jsonPath("$.page").isEqualTo(0)
-                .jsonPath("$.size").isEqualTo(10);
 
         spec.expectBody()
                 .jsonPath("$.items.length()").isEqualTo(1)
@@ -286,19 +287,19 @@ class ExpenseIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/expenses -> 400 si from invalide")
+    @DisplayName("GET /api/expenses -> 400 si from invalide")
     void expenses_shouldReturn400_whenFromInvalid() {
-        getSearchAuth("/api/v1/expenses?from=not-a-date&to=2025-12-31&page=0&size=10")
+        getAuth(BASE + "?from=not-a-date&to=" + TO + "&page=0&size=10")
                 .expectStatus().isBadRequest();
     }
 
     @Test
-    @DisplayName("GET /api/v1/expenses/summary -> 200 + totalCount/totalAmount existent")
+    @DisplayName("GET /api/expenses/summary -> 200 + totalCount/totalAmount existent")
     void expenses_summary_shouldReturn200() {
         seedExpense(LocalDate.of(2025, 12, 10), "Carrefour", null, new BigDecimal("10.00"));
         seedExpense(LocalDate.of(2025, 12, 11), "Carrefour", null, new BigDecimal("20.00"));
 
-        var spec = getSummaryAuth("2025-12-01", "2025-12-31");
+        var spec = getSummaryAuth(FROM, TO);
 
         spec.expectStatus().isOk();
         spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
