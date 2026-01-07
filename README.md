@@ -45,7 +45,7 @@ Expense Tracker isn't just another CRUD app. It is an **expense tracking SaaS** 
       </td>
       <td align="center" width="30%">
         <strong>Mobile Friendly</strong><br>
-        <img src="https://github.com/user-attachments/assets/f56a4b4e-6575-421f-94fe-6afbe470cf2e" alt="Mobile View" width="100%" />
+        <img src="https://github.com/user-attachments/assets/a7c4dae3-1b76-4295-a3cc-7077e5c5b30c" alt="mobile" width="100%" />
       </td>
     </tr>
   </table>
