@@ -1,4 +1,4 @@
-# 🚀 DashApp — Smart Expense Tracking SaaS
+# 🚀 DExpense Tracking SaaS
 
 > **A modern full-stack SaaS for tracking expenses, managing categories, and visualizing financial insights.**  
 > Built with Spring Boot & Angular, designed with real-world SaaS standards in mind.
@@ -6,7 +6,7 @@
 ---
 
 ## 🖥️ Product Preview
-<img width="1900" height="951" alt="dash1" src="https://github.com/user-attachments/assets/0aae08c1-ea1d-4d41-ab24-0e3cc46e4094" />
+<img width="1895" height="938" alt="dash1" src="https://github.com/user-attachments/assets/6b9944eb-538a-46db-8678-49008ffd9348" />
 
 ---
 
@@ -57,7 +57,7 @@ This project was built as a **production-ready SaaS foundation**, not a demo or 
 
 | Distribution & Trends | Dashboard |
 |---|---|
-| <img width="1900" height="951" alt="dash2" src="https://github.com/user-attachments/assets/9042253d-7106-4e28-a6e5-7a2f7ffffef8" /> | <img width="1902" height="940" alt="dash3" src="https://github.com/user-attachments/assets/2eda268a-b15a-4c0d-9b8e-dd568fe5f9c6" /> |
+| <img width="1895" height="938" alt="dash2" src="https://github.com/user-attachments/assets/4bdd55e3-1837-4119-86c1-a9c71c6ea75b" /> | <img width="1895" height="938" alt="dash3" src="https://github.com/user-attachments/assets/1a83d854-f07d-4c68-b124-ea7ba3db9a4a" /> |
 
 ### 🏷️ Categories & Expenses
 
