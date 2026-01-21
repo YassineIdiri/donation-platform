@@ -1,36 +1,36 @@
 import { Routes } from '@angular/router';
-import { guestGuard } from './core/guards/guest.guard';
-import { authGuard } from './core/guards/auth.guard';
 
-import { HomeComponent } from './features/home/home.component';
-import { LoginComponent } from './features/auth/login/login.component';
-import { RegisterComponent } from './features/auth/register/register.component';
+// PUBLIC
+import { HomeComponent } from './features/public/home/home.component';
+import { ThanksComponent } from './features/public/thanks/thanks.component';
+import { FailureComponent } from './features/public/failure/failure.component';
 
-import { MainLayoutComponent } from './layout/main-layout.component';
-import { Dashboard } from './features/dashboard/dashboard.component';
-import { Categories } from './features/categories/categories.component';
-import { Expenses } from './features/expenses/expenses.component';
-import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password.component';
-import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';
-import { TermsComponent } from './features/terms/terms.component';
+// ADMIN
+import { AdminLayoutComponent } from './layout/admin-layout.component';
+import { AdminLoginComponent } from './features/admin/login/admin-login.component';
+import { AdminDonationsComponent } from './features/admin/donations/admin-donations.component';
+import { AdminReceiptsComponent } from './features/admin/receipts/admin-receipts.component';
+import { AdminSettingsComponent } from './features/admin/settings/admin-settings.component';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent , canActivate: [guestGuard] },
-  { path: 'terms', component: TermsComponent, canActivate: [guestGuard] },
-  { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
-  { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
-  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [guestGuard] },
-  { path: 'reset-password', component: ResetPasswordComponent, canActivate: [guestGuard] },
+  // ---- PUBLIC ----
+  { path: '', component: HomeComponent },
+  { path: 'thanks', component: ThanksComponent },
+  { path: 'failure', component: FailureComponent },
+
+  // ---- ADMIN ----
+  { path: 'admin/login', component: AdminLoginComponent },
 
   {
-    path: '',
-    component: MainLayoutComponent,
-    canActivate: [authGuard],
+    path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [adminGuard],
     children: [
-      { path: 'dashboard', component: Dashboard },
-      { path: 'categories', component: Categories },
-      { path: 'expenses', component: Expenses },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'donations', component: AdminDonationsComponent },
+      { path: 'receipts', component: AdminReceiptsComponent },
+       { path: 'settings', component: AdminSettingsComponent },
+      { path: '', redirectTo: 'donations', pathMatch: 'full' },
     ],
   },
 

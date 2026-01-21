@@ -1,0 +1,21 @@
+<div class="min-h-screen bg-gradient-to-br from-[#E0F7FA] via-[#F1F8E9] to-[#E8F5E9] flex items-center justify-center relative overflow-hidden font-sans selection:bg-emerald-200">
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute top-[-10%] left-[10%] w-[500px] h-[500px] bg-emerald-300/20 rounded-full blur-[100px]"></div>
+    <div class="absolute bottom-[-10%] right-[10%] w-[400px] h-[400px] bg-teal-300/20 rounded-full blur-[80px]"></div>
+  </div>
+
+  <main class="relative z-10 w-full max-w-md px-6">
+    <div class="glass-card p-6 rounded-2xl text-center">
+      <h1 class="text-3xl font-extrabold text-emerald-950 mb-2">Paiement échoué</h1>
+      <p class="text-emerald-900/70 mb-6">
+        Le paiement n’a pas pu être confirmé. Vous pouvez réessayer.
+      </p>
+
+      <a routerLink="/" class="btn-primary block">Réessayer</a>
+
+      <div class="mt-4 text-xs text-emerald-900/60">
+        <a routerLink="/contact" class="hover:underline">Besoin d’aide ?</a>
+      </div>
+    </div>
+  </main>
+</div>

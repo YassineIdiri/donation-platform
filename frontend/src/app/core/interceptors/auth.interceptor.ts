@@ -1,9 +1,11 @@
+// src/app/core/interceptors/auth.interceptor.ts
 import {
   HttpErrorResponse,
   HttpInterceptorFn,
   HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   BehaviorSubject,
   catchError,
@@ -13,15 +15,21 @@ import {
   throwError,
 } from 'rxjs';
 
-import { AuthApiService } from '../services/auth-api.service';
-import { TokenStore } from '../services/token-store.service';
-import { AuthService } from '../services/auth.service';
+import { AdminAuthService } from '../services/admin-auth.service';
 
 let refreshing = false;
 const refreshedToken$ = new BehaviorSubject<string | null>(null);
 
-function isAuthRoute(url: string): boolean {
-  return url.includes('/api/auth/');
+function isApi(url: string): boolean {
+  return url.includes('/api/');
+}
+
+function isAdmin(url: string): boolean {
+  return url.includes('/api/admin/');
+}
+
+function isAdminAuth(url: string): boolean {
+  return url.includes('/api/admin/auth/');
 }
 
 function hasBearer(req: HttpRequest<unknown>): boolean {
@@ -34,55 +42,67 @@ function withBearer(req: HttpRequest<unknown>, token: string): HttpRequest<unkno
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const tokenStore = inject(TokenStore);
-  const authApi = inject(AuthApiService);
-  const auth = inject(AuthService);
+  const adminAuth = inject(AdminAuthService);
+  const router = inject(Router);
 
-  if (isAuthRoute(req.url)) {
+  // Ne touche pas aux requêtes non API
+  if (!isApi(req.url)) {
     return next(req);
   }
 
-  const token = tokenStore.get();
-  const request = token ? withBearer(req, token) : req;
+  // Admin auth endpoints: cookies only, pas de Bearer, pas de refresh auto
+  if (isAdminAuth(req.url)) {
+    return next(req.clone({ withCredentials: true }));
+  }
+
+  // Sur /api/admin/**: ajouter Bearer si on a un token
+  let request = req;
+  if (isAdmin(req.url)) {
+    const token = adminAuth.getAccessToken();
+    if (token) {
+      request = withBearer(req, token);
+    }
+  }
 
   return next(request).pipe(
     catchError((err: unknown) => {
-      if (!(err instanceof HttpErrorResponse)) {
-        return throwError(() => err);
-      }
+      if (!(err instanceof HttpErrorResponse)) return throwError(() => err);
 
-      if (err.status !== 401) {
-        return throwError(() => err);
-      }
+      // On ne refresh que si c'est un 401 sur /api/admin/**
+      if (!isAdmin(req.url)) return throwError(() => err);
+      if (err.status !== 401) return throwError(() => err);
 
-      if (!hasBearer(request)) {
-        return throwError(() => err);
-      }
-
+      // Si on reçoit 401 sur une requête admin, on tente un refresh (cookie httpOnly)
+      // et on queue les requêtes pendant le refresh.
       if (!refreshing) {
         refreshing = true;
         refreshedToken$.next(null);
 
-        return authApi.refresh().pipe(
-          switchMap((res) => {
+        return adminAuth.refresh().pipe(
+          switchMap(() => {
             refreshing = false;
 
-            tokenStore.set(res.accessToken);
-            refreshedToken$.next(res.accessToken);
+            const newToken = adminAuth.getAccessToken();
+            if (!newToken) {
+              adminAuth.setAccessToken(null);
+              router.navigateByUrl('/admin/login');
+              return throwError(() => err);
+            }
 
-            return next(withBearer(req, res.accessToken));
+            refreshedToken$.next(newToken);
+            return next(withBearer(req, newToken));
           }),
           catchError((refreshErr) => {
             refreshing = false;
-
-            tokenStore.clear();
-            auth.logoutAndRedirect('expired');
-
+            adminAuth.setAccessToken(null);
+            refreshedToken$.next(null);
+            router.navigateByUrl('/admin/login');
             return throwError(() => refreshErr);
           })
         );
       }
 
+      // Si un refresh est déjà en cours, on attend qu'un nouveau token soit publié
       return refreshedToken$.pipe(
         filter((t): t is string => t !== null),
         take(1),

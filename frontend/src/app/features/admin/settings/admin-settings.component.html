@@ -1,0 +1,82 @@
+<div class="flex items-center justify-between mb-4">
+  <div>
+    <div class="text-lg font-extrabold text-emerald-950">Réglages</div>
+    <div class="text-sm text-emerald-800/70">Titre, couleur, montants suggérés</div>
+  </div>
+
+  <button
+    type="button"
+    class="px-4 py-2 rounded-xl bg-white/70 border border-white/40 hover:bg-white transition"
+    (click)="save()"
+    [disabled]="loading || saving"
+  >
+    {{ saving ? 'Enregistrement…' : 'Enregistrer' }}
+  </button>
+</div>
+
+<div *ngIf="toast" class="mb-3 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-emerald-900">
+  {{ toast }}
+</div>
+
+<div *ngIf="error" class="mb-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-red-800">
+  {{ error }}
+</div>
+
+<div *ngIf="loading" class="opacity-70">Chargement…</div>
+
+<form *ngIf="!loading" [formGroup]="form" class="space-y-4">
+  <div>
+    <label class="block text-sm font-semibold text-emerald-950 mb-1">Titre</label>
+    <input
+      type="text"
+      formControlName="title"
+      class="w-full rounded-xl px-3 py-2 bg-white/70 border border-white/40 outline-none"
+      placeholder="Association …"
+    />
+    <div *ngIf="form.controls.title.touched && form.controls.title.invalid" class="text-xs text-red-700 mt-1">
+      Titre requis (max 80 caractères).
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-emerald-950 mb-1">Couleur principale</label>
+    <div class="flex items-center gap-3">
+      <input
+        type="color"
+        formControlName="primaryColor"
+        class="h-10 w-14 rounded-lg border border-white/40 bg-white/70"
+      />
+      <input
+        type="text"
+        formControlName="primaryColor"
+        class="w-44 rounded-xl px-3 py-2 bg-white/70 border border-white/40 outline-none"
+        placeholder="#10B981"
+      />
+    </div>
+    <div *ngIf="form.controls.primaryColor.touched && form.controls.primaryColor.invalid" class="text-xs text-red-700 mt-1">
+      Couleur invalide (format attendu: #RRGGBB).
+    </div>
+  </div>
+
+  <div formArrayName="suggestedAmounts">
+    <label class="block text-sm font-semibold text-emerald-950 mb-2">Montants suggérés (5)</label>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-2">
+      <div *ngFor="let c of suggestedAmounts.controls; let i = index" class="flex flex-col gap-1">
+        <input
+          type="number"
+          min="1"
+          [formControlName]="i"
+          class="w-full rounded-xl px-3 py-2 bg-white/70 border border-white/40 outline-none"
+        />
+        <div *ngIf="amountCtrl(i).touched && amountCtrl(i).invalid" class="text-xs text-red-700">
+          ≥ 1
+        </div>
+      </div>
+    </div>
+
+    <div class="text-xs text-emerald-900/70 mt-2">
+      Exactement 5 montants. Chaque montant doit être ≥ 1.
+    </div>
+  </div>
+</form>
