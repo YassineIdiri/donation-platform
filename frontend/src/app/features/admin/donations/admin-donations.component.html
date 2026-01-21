@@ -1,0 +1,27 @@
+<div *ngIf="loading">Chargement…</div>
+<div *ngIf="error" class="text-red-600">{{ error }}</div>
+
+<div *ngIf="!loading && !error">
+  <div *ngIf="filtered.length === 0" class="opacity-70">Aucun don.</div>
+
+  <table *ngIf="filtered.length > 0" class="w-full">
+    <tr *ngFor="let d of filtered">
+      <td>{{ d.createdAt }}</td>
+      <td>{{ d.status }}</td>
+      <td>{{ d.amountCents / 100 }} {{ d.currency }}</td>
+      <td>{{ d.emailMasked }}</td>
+    </tr>
+  </table>
+
+  <div class="mt-4 flex items-center gap-2">
+    <button (click)="prevPage()" [disabled]="page === 0">Précédent</button>
+
+    <span>
+    Page {{ pageData.page + 1 }} / {{ pageData.totalPages || 1 }}
+  </span>
+
+    <button (click)="nextPage()" [disabled]="pageData.last">Suivant</button>
+  </div>
+
+
+</div>
