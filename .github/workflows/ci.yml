@@ -47,6 +47,8 @@ jobs:
           APP_STRIPE_SECRET_KEY: sk_test_ci_dummy_secret_key
           APP_STRIPE_PUBLIC_KEY: pk_test_ci_dummy_public_key
           APP_STRIPE_WEBHOOK_SECRET: whsec_ci_dummy_webhook_secret
+          APP_STRIPE_SUCCESS_URL: http://localhost:4200/success
+          APP_STRIPE_CANCEL_URL: http://localhost:4200/cancel
         run: mvn -B -ntp clean verify
 
   frontend:
