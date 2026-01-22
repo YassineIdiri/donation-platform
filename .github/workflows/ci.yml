@@ -52,9 +52,9 @@ jobs:
           APP_SPRING_MAIL_HOST: smtp-relay.brevo.com
           APP_SPRING_MAIL_PORT: 587
           APP_SPRING_MAIL_USERNAME: aaaaaa@smtp-brevo.com
-          APP_SPRING_MAIL_USERNAME_PASSWORD: password
-          APP_SPRING_MAIL_PROPERTIES_MAIL_SMTP: true
-          APP_SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS: true
+          APP_SPRING_MAIL_PASSWORD: password
+          APP_SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
+          APP_SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
           APP_MAIL_FROM: ro.idiri.yassine@gmail.com
           APP_FRONTEND_BASE_URL: http://localhost:420
           APP_RECEIPT_STORAGE_DIR: ./storage/receipts
