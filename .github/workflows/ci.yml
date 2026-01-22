@@ -3,12 +3,28 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "master", "main" ]
 
 jobs:
   backend:
     name: Backend (Spring Boot)
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: donations_ci
+          POSTGRES_USER: donations
+          POSTGRES_PASSWORD: donations
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U donations -d donations_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -22,6 +38,11 @@ jobs:
       - name: Build + tests
         env:
           SPRING_PROFILES_ACTIVE: ci
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/donations_ci
+          SPRING_DATASOURCE_USERNAME: donations
+          SPRING_DATASOURCE_PASSWORD: donations
+          APP_CORS_ALLOWED_ORIGINS: http://localhost:4200
+          APP_JWT_SECRET: ci_dummy_secret
         run: mvn -B -ntp clean verify
 
   frontend:
@@ -30,6 +51,7 @@ jobs:
     defaults:
       run:
         working-directory: frontend
+
     steps:
       - uses: actions/checkout@v4
 
