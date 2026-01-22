@@ -49,6 +49,25 @@ jobs:
           APP_STRIPE_WEBHOOK_SECRET: whsec_ci_dummy_webhook_secret
           APP_STRIPE_SUCCESS_URL: http://localhost:4200/success
           APP_STRIPE_CANCEL_URL: http://localhost:4200/cancel
+          APP_SPRING_MAIL_HOST: smtp-relay.brevo.com
+          APP_SPRING_MAIL_PORT: 587
+          APP_SPRING_MAIL_USERNAME: aaaaaa@smtp-brevo.com
+          APP_SPRING_MAIL_USERNAME_PASSWORD: password
+          APP_SPRING_MAIL_PROPERTIES_MAIL_SMTP: true
+          APP_SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS: true
+          APP_MAIL_FROM: ro.idiri.yassine@gmail.com
+          APP_FRONTEND_BASE_URL: http://localhost:420
+          APP_RECEIPT_STORAGE_DIR: ./storage/receipts
+          APP_RECEIPT_ORG_NAME: Association Solidaire
+          APP_RECEIPT_ORG_ADDRESS: 1 rue Exemple, 75000 Paris
+          APP_RECEIPT_ORG_IDENTIFIER: rrrrrr
+          APP_RECEIPT_ORG_EMAIL: contact@ass.fr
+          APP_AUTH_COOKIE_SECURE: false
+          APP_AUTH_COOKIE_SAMESITE: Strict
+          APP_AUTH_REFRESH_COOKIE_NAME: test
+          APP_AUTH_REFRESH_COOKIE_PATH: /api/admin/test
+          APP_AUTH_ADMIN_EMAIL: test@test.test
+          APP_ADMIN_INITIAL_PASSWORD: test@test.test
         run: mvn -B -ntp clean verify
 
   frontend:
