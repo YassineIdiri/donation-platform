@@ -24,19 +24,22 @@ public class AdminBootstrapRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
         String email = props.email();
-        if (email.isBlank()) {
-            throw new IllegalStateException("Missing app.admin.email (ADMIN_EMAIL)");
+
+        // ✅ En CI / env non configuré : on ne crash pas
+        if (email == null || email.isBlank()) {
+            System.out.println("[ADMIN BOOTSTRAP] Skipped (app.admin.email not set).");
+            return;
         }
 
         // Si admin existe déjà -> rien
         if (users.existsByEmail(email)) return;
 
         String initialPassword = props.initialPassword();
-        if (initialPassword.isBlank()) {
-            throw new IllegalStateException(
-                    "Admin user doesn't exist and app.admin.initial-password is empty. " +
-                            "Provide ADMIN_INITIAL_PASSWORD for first boot."
-            );
+
+        // ✅ Si pas de mot de passe fourni : on ne crash pas
+        if (initialPassword == null || initialPassword.isBlank()) {
+            System.out.println("[ADMIN BOOTSTRAP] Skipped (admin missing but initial password not set).");
+            return;
         }
 
         User u = new User();

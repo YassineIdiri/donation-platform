@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ "master" ]
+    branches: [ "main", "master" ]
 
 jobs:
   backend:
@@ -20,6 +20,8 @@ jobs:
           cache: maven
 
       - name: Build + tests
+        env:
+          SPRING_PROFILES_ACTIVE: ci
         run: mvn -B -ntp clean verify
 
   frontend:
@@ -41,10 +43,10 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Lint (si tu as un script lint)
+      - name: Lint
         run: npm run lint --if-present
 
-      - name: Tests (si tu as un script test)
+      - name: Tests
         run: npm test --if-present
 
       - name: Build

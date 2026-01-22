@@ -1,4 +1,3 @@
-// src/main/java/com/yassine/donationplatform/security/admin/AdminPasswordResetRunner.java
 package com.yassine.donationplatform.security.admin;
 
 import com.yassine.donationplatform.security.refresh.RefreshTokenService;
@@ -28,12 +27,21 @@ public class AdminPasswordResetRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
         String reset = props.resetPassword();
-        if (reset.isBlank()) return; // pas de reset demandé
+        if (reset == null || reset.isBlank()) return; // pas de reset demandé
 
         String email = props.email();
-        var user = users.findByEmail(email).orElseThrow(() ->
-                new IllegalStateException("Admin user not found for reset: " + email));
+        if (email == null || email.isBlank()) {
+            System.out.println("[ADMIN RESET] Skipped (app.admin.email not set).");
+            return;
+        }
 
+        var userOpt = users.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            System.out.println("[ADMIN RESET] Skipped (admin user not found: " + email + ").");
+            return;
+        }
+
+        var user = userOpt.get();
         user.setPasswordHash(encoder.encode(reset));
         users.save(user);
 
