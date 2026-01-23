@@ -36,7 +36,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   bubbleAmounts: number[] = [20, 50, 30, 100, 5];
 
-  readonly ctaText = computed(() => (this.paying ? 'Redirection…' : 'Faire un don'));
+  readonly ctaText = computed(() => (this.paying ? 'Redirecting…' : 'Donate'));
 
   constructor(
     private readonly api: PublicApiService,
@@ -102,7 +102,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error(err);
-          this.error = "Impossible de charger la page. Réessayez.";
+          this.error = "Unable to load the page. Please try again.";
           this.repaint();
         },
       });
@@ -115,7 +115,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.currentAmount.set(0);
       return;
     }
-    // clamp simple
+    // simple clamp
     const clamped = Math.max(0, Math.min(Math.floor(v), 100000));
     this.currentAmount.set(clamped);
     this.repaint();
@@ -131,7 +131,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const amount = Number(this.currentAmount());
     if (!Number.isFinite(amount) || amount < 1) {
-      this.error = 'Veuillez saisir un montant (minimum 1€).';
+      this.error = 'Please enter an amount (minimum €1).';
       this.repaint();
       return;
     }
@@ -155,7 +155,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (res) => {
           if (!this.isBrowser || !res?.checkoutUrl) {
-            this.error = 'Impossible de démarrer le paiement.';
+            this.error = 'Unable to start the payment.';
             this.repaint();
             return;
           }
@@ -163,7 +163,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error(err);
-          this.error = err?.error?.message ?? 'Paiement impossible. Réessayez.';
+          this.error = err?.error?.message ?? 'Payment failed. Please try again.';
           this.repaint();
         },
       });
