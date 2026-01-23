@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/account/support-reset-password").permitAll()
                         .requestMatchers("/api/admin/**").authenticated()
                         .requestMatchers("/api/webhooks/**").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/**").permitAll()
                         .anyRequest().permitAll()
                 )
