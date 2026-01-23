@@ -18,6 +18,8 @@ export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'thanks', component: ThanksComponent },
   { path: 'failure', component: FailureComponent },
+  { path: 'privacy', component: PrivacyComponent },
+  { path: 'legal', component: LegalComponent },
 
   // ---- ADMIN ----
   { path: 'admin/login', component: AdminLoginComponent },
