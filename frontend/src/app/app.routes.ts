@@ -4,6 +4,8 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './features/public/home/home.component';
 import { ThanksComponent } from './features/public/thanks/thanks.component';
 import { FailureComponent } from './features/public/failure/failure.component';
+import { PrivacyComponent } from './features/public/privacy/privacy.component';
+import { LegalComponent } from './features/public/legal/legal.component';
 
 // ADMIN
 import { AdminLayoutComponent } from './layout/admin-layout.component';
