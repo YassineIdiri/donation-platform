@@ -15,7 +15,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
         </div>
-        <span class="text-sm font-bold tracking-wide">Retour</span>
+        <span class="text-sm font-bold tracking-wide">Back</span>
       </a>
     </nav>
 
@@ -23,16 +23,16 @@
 
       <header class="text-center mb-8">
         <h1 class="text-5xl font-extrabold text-emerald-950 tracking-tight mb-3 drop-shadow-sm">
-          Merci <span class="text-emerald-500">!</span>
+          Thank you <span class="text-emerald-500">!</span>
         </h1>
         <p class="text-emerald-800/80 text-lg font-medium leading-relaxed max-w-xs mx-auto">
-          Votre soutien fait toute la différence pour notre mission.
+          Your support makes all the difference to our mission.
         </p>
       </header>
 
       <div *ngIf="loading" class="flex flex-col items-center justify-center py-12">
         <div class="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
-        <p class="mt-4 text-emerald-800 font-medium">Finalisation du don...</p>
+        <p class="mt-4 text-emerald-800 font-medium">Finalizing donation...</p>
       </div>
 
       <div *ngIf="error" class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 text-red-800 flex items-start gap-3 shadow-sm">
@@ -49,19 +49,19 @@
 
         <div class="p-8 text-center border-b border-emerald-100/50 relative">
           <span class="inline-block py-1 px-3 rounded-full bg-emerald-100/50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
-            Donation confirmée
+            Donation confirmed
           </span>
           <div class="flex items-baseline justify-center gap-1 text-emerald-950">
             <span class="text-6xl font-extrabold">{{ euros() }}</span>
           </div>
-          <div class="text-sm text-emerald-600/70 mt-1 font-mono">Réf: #{{ donation.id }}</div>
+          <div class="text-sm text-emerald-600/70 mt-1 font-mono">Ref: #{{ donation.id }}</div>
 
           <div class="mt-4 flex justify-center gap-2">
              <span class="status-pill" [class.paid]="isPaid()" [class.pending]="!isPaid()">
               {{ donation.status }}
             </span>
             <button *ngIf="!isPaid()" (click)="refreshStatus()" [disabled]="refreshing" class="text-xs font-bold text-emerald-600 hover:underline disabled:opacity-50">
-              {{ refreshing ? '...' : 'Actualiser' }}
+              {{ refreshing ? '...' : 'Refresh' }}
             </button>
           </div>
         </div>
@@ -74,8 +74,8 @@
               </svg>
             </div>
             <div>
-              <h3 class="text-emerald-950 font-bold text-lg leading-tight">Reçu fiscal</h3>
-              <p class="text-xs text-emerald-700/70">Réduction d’impôt sur le revenu : jusqu’à 66%.</p>
+              <h3 class="text-emerald-950 font-bold text-lg leading-tight">Tax receipt</h3>
+              <p class="text-xs text-emerald-700/70">Income tax reduction: up to 66%.</p>
             </div>
           </div>
 
@@ -88,7 +88,7 @@
             </div>
 
             <span class="ml-3 text-sm font-semibold text-emerald-900 group-hover:text-emerald-700 select-none">
-            Je souhaite recevoir mon reçu fiscal
+            I would like to receive my tax receipt
           </span>
           </label>
 
@@ -97,20 +97,20 @@
             <div class="grid grid-cols-1 gap-4">
               <div class="space-y-1">
                 <label class="text-xs font-bold text-emerald-800 uppercase tracking-wide ml-1">Email</label>
-                <input class="input-premium" type="email" [formControl]="form.controls.email" placeholder="exemple@email.com" />
-                <div class="text-xs text-red-500 ml-1 mt-1" *ngIf="form.controls.email.touched && form.controls.email.invalid">Email invalide</div>
+                <input class="input-premium" type="email" [formControl]="form.controls.email" placeholder="example@email.com" />
+                <div class="text-xs text-red-500 ml-1 mt-1" *ngIf="form.controls.email.touched && form.controls.email.invalid">Invalid email</div>
               </div>
 
               <div class="space-y-1">
-                <label class="text-xs font-bold text-emerald-800 uppercase tracking-wide ml-1">Nom Complet</label>
-                <input class="input-premium" type="text" [formControl]="form.controls.fullName" placeholder="Jean Dupont" />
-                <div class="text-xs text-red-500 ml-1 mt-1" *ngIf="form.controls.fullName.touched && form.controls.fullName.invalid">Requis</div>
+                <label class="text-xs font-bold text-emerald-800 uppercase tracking-wide ml-1">Full name</label>
+                <input class="input-premium" type="text" [formControl]="form.controls.fullName" placeholder="John Doe" />
+                <div class="text-xs text-red-500 ml-1 mt-1" *ngIf="form.controls.fullName.touched && form.controls.fullName.invalid">Required</div>
               </div>
 
               <div class="space-y-1">
-                <label class="text-xs font-bold text-emerald-800 uppercase tracking-wide ml-1">Adresse Postale</label>
-                <textarea class="input-premium min-h-[80px]" [formControl]="form.controls.address" placeholder="10 rue de la Paix, 75000 Paris"></textarea>
-                <div class="text-xs text-red-500 ml-1 mt-1" *ngIf="form.controls.address.touched && form.controls.address.invalid">Requis pour le CERFA</div>
+                <label class="text-xs font-bold text-emerald-800 uppercase tracking-wide ml-1">Mailing address</label>
+                <textarea class="input-premium min-h-[80px]" [formControl]="form.controls.address" placeholder="10 Peace St, 75000 Paris"></textarea>
+                <div class="text-xs text-red-500 ml-1 mt-1" *ngIf="form.controls.address.touched && form.controls.address.invalid">Required for CERFA</div>
               </div>
             </div>
 
@@ -119,10 +119,10 @@
                 <input type="checkbox" [formControl]="form.controls.consent" class="checkbox-premium" />
               </div>
               <span class="text-xs text-emerald-800/70 leading-relaxed group-hover:text-emerald-900 transition-colors">
-                J’accepte la <a routerLink="/confidentialite" class="underline decoration-emerald-400 hover:text-emerald-600">politique de confidentialité</a>.
+                I accept the <a routerLink="/confidentialite" class="underline decoration-emerald-400 hover:text-emerald-600">privacy policy</a>.
               </span>
             </label>
-            <div class="text-xs text-red-500 ml-1" *ngIf="form.controls.consent.touched && form.controls.consent.invalid">Consentement obligatoire.</div>
+            <div class="text-xs text-red-500 ml-1" *ngIf="form.controls.consent.touched && form.controls.consent.invalid">Consent is required.</div>
 
             <button
               type="button"
@@ -130,10 +130,10 @@
               [disabled]="sending || form.invalid"
               class="btn-primary w-full mt-4 group"
             >
-              <span *ngIf="!sending">Envoyer la demande</span>
+              <span *ngIf="!sending">Send request</span>
               <span *ngIf="sending" class="flex items-center justify-center gap-2">
                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                 Envoi en cours...
+                 Sending...
               </span>
               <svg *ngIf="!sending" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 group-hover:translate-x-1 transition-transform">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -141,8 +141,8 @@
             </button>
 
             <div *ngIf="receipt" class="mt-4 p-3 bg-emerald-50 rounded-lg text-center border border-emerald-100">
-              <p class="text-xs font-bold text-emerald-800">Demande enregistrée !</p>
-              <p class="text-[10px] text-emerald-600">Reçu n° {{ receipt.receiptNumber }}</p>
+              <p class="text-xs font-bold text-emerald-800">Request saved!</p>
+              <p class="text-[10px] text-emerald-600">Receipt No. {{ receipt.receiptNumber }}</p>
             </div>
 
           </div>
@@ -151,13 +151,13 @@
 
       <div class="mt-8 flex justify-center gap-4">
         <a routerLink="/" class="text-sm font-semibold text-emerald-700 hover:text-emerald-900 hover:bg-emerald-100/50 px-4 py-2 rounded-full transition-all">
-          Retour à l'accueil
+          Back to home
         </a>
       </div>
 
       <footer class="mt-12 text-[10px] uppercase tracking-widest text-emerald-900/40 flex gap-6 justify-center font-bold">
-        <a routerLink="/mentions-legales" class="hover:text-emerald-600 transition-colors">Mentions</a>
-        <a routerLink="/confidentialite" class="hover:text-emerald-600 transition-colors">Confidentialité</a>
+        <a routerLink="/mentions-legales" class="hover:text-emerald-600 transition-colors">Legal</a>
+        <a routerLink="/confidentialite" class="hover:text-emerald-600 transition-colors">Privacy</a>
         <a routerLink="/contact" class="hover:text-emerald-600 transition-colors">Contact</a>
       </footer>
 

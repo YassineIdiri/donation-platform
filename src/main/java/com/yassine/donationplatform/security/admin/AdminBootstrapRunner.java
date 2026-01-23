@@ -1,7 +1,7 @@
 package com.yassine.donationplatform.security.admin;
 
-import com.yassine.donationplatform.user.User;
-import com.yassine.donationplatform.user.UserRepository;
+import com.yassine.donationplatform.entity.auth.User;
+import com.yassine.donationplatform.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -25,18 +25,15 @@ public class AdminBootstrapRunner implements CommandLineRunner {
     public void run(String... args) {
         String email = props.email();
 
-        // ✅ En CI / env non configuré : on ne crash pas
         if (email == null || email.isBlank()) {
             System.out.println("[ADMIN BOOTSTRAP] Skipped (app.admin.email not set).");
             return;
         }
 
-        // Si admin existe déjà -> rien
         if (users.existsByEmail(email)) return;
 
         String initialPassword = props.initialPassword();
 
-        // ✅ Si pas de mot de passe fourni : on ne crash pas
         if (initialPassword == null || initialPassword.isBlank()) {
             System.out.println("[ADMIN BOOTSTRAP] Skipped (admin missing but initial password not set).");
             return;

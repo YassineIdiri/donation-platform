@@ -32,13 +32,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   settings: SettingsResponse | null = null;
 
-  // signal amount (ta template utilise currentAmount())
   readonly currentAmount = signal<number>(20);
 
-  // on affichera 5 bulles max (comme ton UI)
   bubbleAmounts: number[] = [20, 50, 30, 100, 5];
 
-  // texte CTA dynamique
   readonly ctaText = computed(() => (this.paying ? 'Redirection…' : 'Faire un don'));
 
   constructor(
@@ -90,17 +87,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         next: (s) => {
           this.settings = s;
 
-          // appliquer couleur principale en CSS variable (optionnel)
-          if (this.isBrowser && s?.primaryColor) {
-            document.documentElement.style.setProperty('--primary', s.primaryColor);
-          }
-
-          // adapter les bulles depuis le backend si possible
           const amounts = (s?.suggestedAmounts ?? []).filter((n) => Number.isFinite(n) && n > 0);
           if (amounts.length >= 1) {
-            // on prend 5 max
             const a = amounts.slice(0, 5);
-            // si <5, on complète
             while (a.length < 5) a.push([20, 50, 30, 100, 5][a.length]);
             this.bubbleAmounts = a;
             this.currentAmount.set(a[0] ?? 20);

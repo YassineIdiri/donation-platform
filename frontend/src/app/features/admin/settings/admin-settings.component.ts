@@ -24,9 +24,9 @@ import { ui, Ui } from '../../../core/utils/zoneless-ui';
 const DEFAULT_AMOUNTS = [5, 20, 30, 50, 100];
 const FIXED_COUNT = 5;
 
+// Removal of primaryColor from the type
 type SettingsForm = {
   title: FormControl<string>;
-  primaryColor: FormControl<string>;
   suggestedAmounts: FormArray<FormControl<number>>;
 };
 
@@ -57,20 +57,15 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
     this.isBrowser = isPlatformBrowser(platformId);
     this.ui = ui(this.cdr);
 
-    // ✅ init form
+    // Removal of the primaryColor control
     this.form = this.fb.group<SettingsForm>({
       title: this.fb.nonNullable.control('', [
         Validators.required,
         Validators.maxLength(80),
       ]),
-      primaryColor: this.fb.nonNullable.control('#10B981', [
-        Validators.required,
-        Validators.pattern(/^#[0-9A-Fa-f]{6}$/),
-      ]),
       suggestedAmounts: this.fb.array<FormControl<number>>([]),
     });
 
-    // ✅ Toujours 5 champs
     for (let i = 0; i < FIXED_COUNT; i++) {
       const v = DEFAULT_AMOUNTS[i] ?? 10;
       this.suggestedAmounts.push(
@@ -80,17 +75,6 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
         ])
       );
     }
-
-    // ✅ Synchronisation couleur: normalise dès qu'on change
-    this.form.controls.primaryColor.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((v) => {
-        const normalized = normalizeHex6(v);
-        if (normalized !== v) {
-          this.form.controls.primaryColor.setValue(normalized, { emitEvent: false });
-          this.ui.repaint();
-        }
-      });
   }
 
   ngOnInit(): void {
@@ -124,9 +108,8 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (s: PublicUiSettings) => {
           const title = s?.title ?? '';
-          const color = normalizeHex6(s?.primaryColor ?? '#10B981');
 
-          // ✅ Toujours 5 valeurs: pad/trim
+          // ✅ Always 5 values: pad/trim
           const incoming = Array.isArray(s?.suggestedAmounts) ? s.suggestedAmounts : [];
           const cleaned = incoming
             .map((x) => Number(x))
@@ -138,24 +121,23 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
           }
 
           this.ui.set(() => {
+            // No more patchValue on primaryColor
             this.form.patchValue({
               title,
-              primaryColor: color,
             });
 
-            // ✅ Remplit exactement les 5 controls existants (pas clear/push)
+            // ✅ Fills exactly the 5 existing controls
             for (let i = 0; i < FIXED_COUNT; i++) {
               this.suggestedAmounts.at(i).setValue(fixed[i], { emitEvent: false });
             }
           });
         },
         error: () => {
-          this.ui.set(() => (this.error = 'Impossible de charger les réglages.'));
+          this.ui.set(() => (this.error = 'Unable to load settings.'));
         },
       });
   }
 
-  // ✅ Optionnel: helper pour la vue
   amountCtrl(i: number): FormControl<number> {
     return this.suggestedAmounts.at(i) as FormControl<number>;
   }
@@ -177,17 +159,15 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
 
     const raw = this.form.getRawValue();
 
+    // Removal of primaryColor from the payload
     const payload: PublicUiSettings = {
       title: String(raw.title ?? '').trim(),
-      primaryColor: normalizeHex6(String(raw.primaryColor ?? '')),
-      // ✅ Toujours 5 montants
       suggestedAmounts: (raw.suggestedAmounts ?? [])
         .map((x) => Number(x))
         .map((x) => (Number.isFinite(x) && x > 0 ? Math.floor(x) : 1))
         .slice(0, FIXED_COUNT),
     };
 
-    // Sécurité: si jamais un champ est vide, on pad quand même
     while (payload.suggestedAmounts.length < FIXED_COUNT) {
       payload.suggestedAmounts.push(DEFAULT_AMOUNTS[payload.suggestedAmounts.length] ?? 10);
     }
@@ -201,36 +181,12 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: () => {
-          this.ui.set(() => (this.toast = 'Réglages enregistrés ✅'));
+          this.ui.set(() => (this.toast = 'Settings saved ✅'));
           if (this.isBrowser) {
             window.setTimeout(() => this.ui.set(() => (this.toast = null)), 2500);
           }
         },
-        error: () => this.ui.set(() => (this.error = 'Enregistrement impossible.')),
+        error: () => this.ui.set(() => (this.error = 'Save failed.')),
       });
   }
-}
-
-/** Normalise en "#RRGGBB" uppercase, fallback si invalide */
-function normalizeHex6(v: string | null | undefined): string {
-  const fallback = '#10B981';
-  if (!v) return fallback;
-
-  let s = String(v).trim();
-  if (!s.startsWith('#')) s = `#${s}`;
-
-  // garde uniquement # + hex
-  s = s.replace(/[^#0-9a-fA-F]/g, '');
-
-  // "#ABC" -> "#AABBCC"
-  if (/^#[0-9a-fA-F]{3}$/.test(s)) {
-    const r = s[1], g = s[2], b = s[3];
-    s = `#${r}${r}${g}${g}${b}${b}`;
-  }
-
-  // tronque à 7
-  s = s.slice(0, 7);
-
-  if (!/^#[0-9a-fA-F]{6}$/.test(s)) return fallback;
-  return s.toUpperCase();
 }

@@ -1,9 +1,8 @@
-// src/main/java/com/yassine/donationplatform/service/SettingsService.java
 package com.yassine.donationplatform.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yassine.donationplatform.domain.settings.AppSettings;
+import com.yassine.donationplatform.entity.settings.AppSettings;
 import com.yassine.donationplatform.dto.request.UpdateSettingsRequest;
 import com.yassine.donationplatform.dto.response.SettingsResponse;
 import com.yassine.donationplatform.repository.AppSettingsRepository;
@@ -41,8 +40,6 @@ public class SettingsService {
             JsonNode root = objectMapper.readTree(jsonStr);
 
             String title = root.path("title").asText("Association Solidaire");
-            String color = root.path("primaryColor").asText("#0ea5e9");
-
             List<Integer> amounts = new ArrayList<>();
             JsonNode arr = root.path("suggestedAmounts");
             if (arr.isArray()) {
@@ -62,7 +59,7 @@ public class SettingsService {
             if (amounts.isEmpty()) amounts = List.of(10, 20, 50, 100);
             else amounts = amounts.stream().distinct().sorted().limit(8).toList();
 
-            return new SettingsResponse(title, color, amounts);
+            return new SettingsResponse(title, amounts);
         } catch (Exception e) {
             return defaultResponse();
         }
@@ -84,7 +81,6 @@ public class SettingsService {
         try {
             JsonNode json = objectMapper.createObjectNode()
                     .put("title", req.getTitle())
-                    .put("primaryColor", req.getPrimaryColor())
                     .set("suggestedAmounts", objectMapper.valueToTree(cleaned));
 
             String jsonStr = objectMapper.writeValueAsString(json);
@@ -100,13 +96,13 @@ public class SettingsService {
             row.setSettingsJson(jsonStr);
             repo.save(row);
 
-            return new SettingsResponse(req.getTitle(), req.getPrimaryColor(), cleaned);
+            return new SettingsResponse(req.getTitle(),  cleaned);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update settings", e);
         }
     }
 
     private SettingsResponse defaultResponse() {
-        return new SettingsResponse("Association Solidaire", "#0ea5e9", List.of(10, 20, 50, 100));
+        return new SettingsResponse("Association Solidaire", List.of(10, 20, 50, 100));
     }
 }

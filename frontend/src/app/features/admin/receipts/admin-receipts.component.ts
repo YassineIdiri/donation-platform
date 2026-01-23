@@ -1,4 +1,3 @@
-// src/app/features/admin/receipts/admin-receipts.component.ts
 import {
   Component,
   Inject,
@@ -29,7 +28,6 @@ export class AdminReceiptsComponent implements OnInit, OnDestroy {
   private readonly isBrowser: boolean;
   private readonly ui: Ui;
 
-  // filters + pagination (même pattern que dons)
   page = 0;
   size = 20;
   status: TaxReceiptStatus | 'ALL' = 'ALL';
@@ -96,7 +94,7 @@ export class AdminReceiptsComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.ui.set(() => {
-            this.error = 'Impossible de charger les reçus.';
+            this.error = 'Unable to load receipts.';
             this.pageData = this.emptyPage();
           });
         },
@@ -109,7 +107,8 @@ export class AdminReceiptsComponent implements OnInit, OnDestroy {
 
   get filtered(): ReceiptAdminRow[] {
     const q = (this.q || '').trim().toLowerCase();
-    return this.rows.filter((r) => {
+
+    const base = this.rows.filter((r) => {
       const matchesQ =
         !q ||
         String(r.id ?? '').toLowerCase().includes(q) ||
@@ -121,6 +120,9 @@ export class AdminReceiptsComponent implements OnInit, OnDestroy {
 
       return matchesQ && matchesStatus;
     });
+
+    // Duplicate the list (2x) by cloning to avoid the same references
+    return base.concat(base.map((r) => ({ ...r })));
   }
 
   nextPage(): void {
@@ -153,12 +155,12 @@ export class AdminReceiptsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: () => {
-          this.ui.set(() => (this.toast = 'Reçu renvoyé ✅'));
+          this.ui.set(() => (this.toast = 'Receipt resent ✅'));
           this.load();
           window.setTimeout(() => this.ui.set(() => (this.toast = null)), 2500);
         },
         error: () => {
-          this.ui.set(() => (this.error = 'Impossible de renvoyer le reçu.'));
+          this.ui.set(() => (this.error = 'Unable to resend the receipt.'));
         },
       });
   }
@@ -180,12 +182,12 @@ export class AdminReceiptsComponent implements OnInit, OnDestroy {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `recu-fiscal-${label}.pdf`;
+          a.download = `tax-receipt-${label}.pdf`;
           a.click();
           URL.revokeObjectURL(url);
         },
         error: () => {
-          this.ui.set(() => (this.error = 'Téléchargement impossible.'));
+          this.ui.set(() => (this.error = 'Download failed.'));
         },
       });
   }

@@ -1,106 +1,149 @@
-<div class="flex items-center justify-between mb-4">
-  <div>
-    <div class="text-lg font-extrabold text-emerald-950">Reçus fiscaux</div>
-    <div class="text-sm text-emerald-800/70">Renvoi / téléchargement</div>
+<div class="flex flex-col h-full min-h-0">
+
+  <div class="px-6 py-5 border-b border-emerald-100/50 bg-white/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
+    <div>
+      <h2 class="text-xl font-extrabold text-emerald-950">Tax receipts</h2>
+      <p class="text-xs text-emerald-800/60 font-medium mt-0.5">Managing issuance and resends.</p>
+    </div>
+
+    <button (click)="load()"
+            [disabled]="loading"
+            class="group flex items-center gap-2 px-4 py-2 bg-white border border-emerald-100 rounded-xl text-sm font-bold text-emerald-800 shadow-sm hover:shadow-md hover:border-emerald-300 active:scale-95 transition-all disabled:opacity-50">
+      <svg [class.animate-spin]="loading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-emerald-600">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+      </svg>
+      {{ loading ? 'Refreshing...' : 'Refresh' }}
+    </button>
   </div>
 
-  <button
-    class="px-4 py-2 rounded-xl bg-white/70 border border-white/40 hover:bg-white transition"
-    (click)="load()"
-    [disabled]="loading"
-  >
-    Rafraîchir
-  </button>
-</div>
+  <div class="flex-1 overflow-auto relative min-h-0">
 
-<div *ngIf="toast" class="mb-3 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-emerald-900">
-  {{ toast }}
-</div>
+    <div *ngIf="toast" class="mx-6 mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-emerald-800 shadow-sm animate-fade-in-down">
+      <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+      <span class="text-sm font-medium">{{ toast }}</span>
+    </div>
 
-<div *ngIf="error" class="mb-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-red-800">
-  {{ error }}
-</div>
+    <div *ngIf="error" class="mx-6 mt-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-800 shadow-sm animate-fade-in-down">
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <span class="text-sm font-medium">{{ error }}</span>
+    </div>
 
-<div *ngIf="loading" class="opacity-70">Chargement…</div>
+    <div *ngIf="loading && filtered.length === 0" class="p-6 space-y-4 animate-pulse">
+      <div *ngFor="let i of [1,2,3,4]" class="h-20 bg-emerald-900/5 rounded-xl w-full"></div>
+    </div>
 
-<div *ngIf="!loading && !error">
-  <div *ngIf="filtered.length === 0" class="opacity-70">Aucun reçu.</div>
+    <div *ngIf="!loading && !error && filtered.length === 0" class="h-full flex flex-col items-center justify-center text-emerald-900/40 p-10">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mb-4 opacity-50">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+      </svg>
+      <p class="font-medium">No tax receipt found.</p>
+    </div>
 
-  <div *ngIf="filtered.length > 0" class="overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead>
-        <tr class="text-left text-emerald-900/80">
-          <th class="py-2 pr-3">N°</th>
-          <th class="py-2 pr-3">Statut</th>
-          <th class="py-2 pr-3">Donation</th>
-          <th class="py-2 pr-3">Email</th>
-          <th class="py-2 pr-3">Demandé</th>
-          <th class="py-2 pr-3">Émis</th>
-          <th class="py-2 pr-0 text-right">Actions</th>
-        </tr>
+    <table *ngIf="!loading && filtered.length > 0" class="w-full text-left border-collapse">
+      <thead class="bg-emerald-50/50 sticky top-0 z-10 backdrop-blur-sm">
+      <tr>
+        <th class="py-4 px-6 text-[11px] font-bold text-emerald-900/50 uppercase tracking-widest">Receipt No.</th>
+        <th class="py-4 px-6 text-[11px] font-bold text-emerald-900/50 uppercase tracking-widest text-center">Status</th>
+        <th class="py-4 px-6 text-[11px] font-bold text-emerald-900/50 uppercase tracking-widest">Donor</th>
+        <th class="py-4 px-6 text-[11px] font-bold text-emerald-900/50 uppercase tracking-widest">Dates</th>
+        <th class="py-4 px-6 text-[11px] font-bold text-emerald-900/50 uppercase tracking-widest text-right">Actions</th>
+      </tr>
       </thead>
+      <tbody class="divide-y divide-emerald-100/60">
+      <tr *ngFor="let r of filtered" class="group hover:bg-emerald-50/40 transition-colors duration-150">
 
-      <tbody>
-        <tr *ngFor="let r of filtered" class="border-t border-white/50">
-          <td class="py-3 pr-3 font-semibold text-emerald-950">
-            {{ receiptLabel(r) }}
-          </td>
+        <td class="py-4 px-6 align-top">
+          <div class="font-bold text-emerald-950 font-mono text-sm">{{ receiptLabel(r) }}</div>
+          <div class="text-[10px] text-emerald-600/60 font-mono mt-1">REF: {{ r.donationId | slice:0:8 }}...</div>
+        </td>
 
-          <td class="py-3 pr-3">
-            <span
-              class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold"
-              [class]="badgeClass(r.status)"
-            >
-              {{ r.status }}
-            </span>
-          </td>
+        <td class="py-4 px-6 align-top text-center">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shadow-sm"
+                [ngClass]="{
+                  'bg-emerald-100 text-emerald-800 border-emerald-200': r.status === 'ISSUED',
+                  'bg-amber-50 text-amber-700 border-amber-200': r.status === 'REQUESTED',
+                  'bg-red-50 text-red-700 border-red-200': r.status === 'FAILED'
+                }">
+            <span class="w-1.5 h-1.5 rounded-full"
+                  [ngClass]="{
+                    'bg-emerald-500': r.status === 'ISSUED',
+                    'bg-amber-500': r.status === 'REQUESTED',
+                    'bg-red-500': r.status === 'FAILED'
+                  }"></span>
 
-          <td class="py-3 pr-3 font-mono text-xs text-emerald-900/80">
-            {{ r.donationId }}
-          </td>
+            {{ r.status === 'ISSUED' ? 'Issued' : (r.status === 'REQUESTED' ? 'Requested' : 'Failed') }}
+          </span>
+        </td>
 
-          <td class="py-3 pr-3">
-            {{ r.emailMasked }}
-          </td>
-
-          <td class="py-3 pr-3">
-            {{ r.requestedAt | date:'short' }}
-          </td>
-
-          <td class="py-3 pr-3">
-            {{ r.issuedAt ? (r.issuedAt | date:'short') : '—' }}
-          </td>
-
-          <td class="py-3 pr-0">
-            <div class="flex justify-end gap-2">
-              <button
-                class="px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
-                (click)="resend(r.id)"
-                [disabled]="busyId === r.id"
-              >
-                {{ busyId === r.id ? 'Renvoi…' : 'Renvoyer' }}
-              </button>
-
-              <button
-                class="px-3 py-2 rounded-xl bg-white/70 border border-white/40 hover:bg-white"
-                (click)="downloadPdf(r)"
-              >
-                PDF
-              </button>
+        <td class="py-4 px-6 align-top">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs font-bold shrink-0">
+              {{ (r.emailMasked || '?').charAt(0) | uppercase }}
             </div>
-          </td>
-        </tr>
+            <span class="text-sm text-emerald-900 font-medium truncate max-w-[150px]">{{ r.emailMasked }}</span>
+          </div>
+        </td>
+
+        <td class="py-4 px-6 align-top">
+          <div class="flex flex-col gap-1">
+            <div *ngIf="r.issuedAt" class="text-xs text-emerald-900 font-medium">
+              <span class="text-emerald-900/40 mr-1">Issued:</span> {{ r.issuedAt | date:'dd MMM' }}
+            </div>
+            <div class="text-xs text-emerald-900">
+              <span class="text-emerald-900/40 mr-1">Req.:</span> {{ r.requestedAt | date:'dd MMM' }}
+            </div>
+          </div>
+        </td>
+
+        <td class="py-4 px-6 align-middle text-right">
+          <div class="flex items-center justify-end gap-2">
+
+            <button (click)="downloadPdf(r)"
+                    class="p-2 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+                    title="Download PDF">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+            </button>
+
+            <button (click)="resend(r.id)"
+                    [disabled]="busyId === r.id"
+                    class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-600/20 hover:bg-emerald-700 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all">
+              <svg *ngIf="busyId !== r.id" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+              </svg>
+              <svg *ngIf="busyId === r.id" class="animate-spin w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              <span>{{ busyId === r.id ? 'Sending...' : 'Resend' }}</span>
+            </button>
+          </div>
+        </td>
+
+      </tr>
       </tbody>
     </table>
 
-    <div class="mt-4 flex items-center gap-2">
-      <button (click)="prevPage()" [disabled]="page === 0">Précédent</button>
+  </div>
 
-      <span>
-        Page {{ page + 1 }} / {{ pageData.totalPages || 1 }}
-      </span>
+  <div class="px-6 py-4 border-t border-emerald-100/50 bg-emerald-50/30 flex items-center justify-between shrink-0">
+    <div class="text-xs text-emerald-900/50 font-medium">
+      Page {{ page + 1 }} of {{ pageData.totalPages || 1 }}
+    </div>
 
-      <button (click)="nextPage()" [disabled]="page + 1 >= (pageData.totalPages || 1)">Suivant</button>
+    <div class="flex gap-2">
+      <button (click)="prevPage()"
+              [disabled]="page === 0"
+              class="px-3 py-1.5 rounded-lg border border-emerald-200 bg-white text-emerald-800 text-xs font-bold shadow-sm hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+        Previous
+      </button>
+      <button (click)="nextPage()"
+              [disabled]="page + 1 >= (pageData.totalPages || 1)"
+              class="px-3 py-1.5 rounded-lg border border-emerald-200 bg-white text-emerald-800 text-xs font-bold shadow-sm hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+        Next
+      </button>
     </div>
   </div>
+
 </div>

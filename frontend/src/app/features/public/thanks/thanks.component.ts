@@ -74,7 +74,7 @@ export class ThanksComponent implements OnInit, OnDestroy {
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((m) => {
       this.donationId = m.get('donationId') ?? '';
       if (!this.donationId) {
-        this.error = 'Référence de don manquante.';
+        this.error = 'Missing donation reference.';
         this.loading = false;
         this.repaint();
         return;
@@ -149,7 +149,7 @@ export class ThanksComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error(err);
-          this.error = 'Impossible de récupérer le statut du don.';
+          this.error = 'Unable to fetch the donation status.';
           this.repaint();
         },
       });
@@ -173,12 +173,12 @@ export class ThanksComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (d) => {
           this.donation = d;
-          this.showToast('Statut mis à jour ✅');
+          this.showToast('Status updated ✅');
           this.repaint();
         },
         error: (err) => {
           console.error(err);
-          this.error = 'Actualisation impossible.';
+          this.error = 'Refresh failed.';
           this.repaint();
         },
       });
@@ -188,12 +188,12 @@ export class ThanksComponent implements OnInit, OnDestroy {
     if (this.sending) return;
 
     if (!this.form.get('want')?.value) {
-      this.showToast('Reçu fiscal non demandé.');
+      this.showToast('Tax receipt not requested.');
       return;
     }
 
     if (!this.donation || this.donation.status !== 'PAID') {
-      this.error = 'Le paiement doit être confirmé avant l’émission du reçu fiscal.';
+      this.error = 'Payment must be confirmed before issuing the tax receipt.';
       this.repaint();
       return;
     }
@@ -227,12 +227,12 @@ export class ThanksComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (r) => {
           this.receipt = r;
-          this.showToast('Demande envoyée ✅ Vous recevrez le reçu par email.');
+          this.showToast('Request sent ✅ You will receive the receipt by email.');
           this.repaint();
         },
         error: (err) => {
           console.error(err);
-          this.error = err?.error?.message ?? 'Envoi du reçu fiscal impossible.';
+          this.error = err?.error?.message ?? 'Unable to send the tax receipt request.';
           this.repaint();
         },
       });

@@ -1,4 +1,3 @@
-// src/app/core/admin-auth/admin-auth.service.ts
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -80,10 +79,6 @@ export class AdminAuthService {
       );
   }
 
-  /**
-   * Si pas de token, tente refresh via cookie (SSR-safe).
-   * Renvoie true si session OK, false sinon.
-   */
   ensureSession() {
     if (this.isLoggedIn()) return of(true);
 

@@ -38,7 +38,7 @@ export class AdminLoginComponent {
       },
       error: () => {
         this.loading = false;
-        this.error = 'Identifiants invalides.';
+        this.error = 'Invalid credentials.';
       }
     });
   }

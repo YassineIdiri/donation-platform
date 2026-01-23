@@ -59,11 +59,9 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Lint (si tu as un script lint)
       - name: Lint
         run: npm run lint --if-present
 
-      - name: Tests (si tu as un script test)
       - name: Tests
         run: npm test --if-present
 

@@ -91,7 +91,7 @@ export class AdminDonationsComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.ui.set(() => {
-            this.error = 'Impossible de charger les dons';
+            this.error = 'Unable to load donations';
             this.pageData = this.emptyPage();
           });
         },

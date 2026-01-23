@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "smart-expense-tracker": {
+    "donation-platform": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -66,10 +66,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "smart-expense-tracker:build:production"
+              "buildTarget": "donation-platform:build:production"
             },
             "development": {
-              "buildTarget": "smart-expense-tracker:build:development"
+              "buildTarget": "donation-platform:build:development"
             }
           },
           "defaultConfiguration": "development"

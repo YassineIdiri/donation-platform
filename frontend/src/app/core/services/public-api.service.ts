@@ -4,7 +4,6 @@ import { environment } from '../../../environments/environment';
 
 export type SettingsResponse = {
   title: string;
-  primaryColor: string;
   suggestedAmounts: number[];
 };
 

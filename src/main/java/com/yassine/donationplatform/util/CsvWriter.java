@@ -33,7 +33,6 @@ public final class CsvWriter {
 
     private static String escape(String v) {
         if (v == null) return "";
-        // simple CSV; on échappe les ';' et '\n' via guillemets si besoin
         if (v.contains(";") || v.contains("\n") || v.contains("\"")) {
             return "\"" + v.replace("\"", "\"\"") + "\"";
         }

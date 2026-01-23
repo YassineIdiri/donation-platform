@@ -1,7 +1,7 @@
 package com.yassine.donationplatform.security.admin;
 
-import com.yassine.donationplatform.security.refresh.RefreshTokenService;
-import com.yassine.donationplatform.user.UserRepository;
+import com.yassine.donationplatform.service.auth.RefreshTokenService;
+import com.yassine.donationplatform.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -45,7 +45,6 @@ public class AdminPasswordResetRunner implements CommandLineRunner {
         user.setPasswordHash(encoder.encode(reset));
         users.save(user);
 
-        // Important : invalider toutes les sessions
         refreshTokens.revokeAllForUser(user.getId());
 
         System.out.println("[ADMIN RESET] Password updated for " + email);

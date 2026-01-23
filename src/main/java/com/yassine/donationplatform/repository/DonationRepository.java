@@ -1,6 +1,6 @@
 package com.yassine.donationplatform.repository;
 
-import com.yassine.donationplatform.domain.donation.Donation;
+import com.yassine.donationplatform.entity.donation.Donation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

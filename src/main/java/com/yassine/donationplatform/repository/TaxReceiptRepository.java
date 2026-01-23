@@ -1,6 +1,6 @@
 package com.yassine.donationplatform.repository;
 
-import com.yassine.donationplatform.domain.receipt.TaxReceipt;
+import com.yassine.donationplatform.entity.receipt.TaxReceipt;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

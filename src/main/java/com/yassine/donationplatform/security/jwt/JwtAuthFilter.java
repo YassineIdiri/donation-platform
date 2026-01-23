@@ -2,9 +2,10 @@
 package com.yassine.donationplatform.security.jwt;
 
 import com.yassine.donationplatform.security.admin.AdminProps;
-import com.yassine.donationplatform.security.auth.AuthUser;
-import com.yassine.donationplatform.user.User;
-import com.yassine.donationplatform.user.UserRepository;
+import com.yassine.donationplatform.dto.AuthUser;
+import com.yassine.donationplatform.entity.auth.User;
+import com.yassine.donationplatform.repository.UserRepository;
+import com.yassine.donationplatform.service.auth.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,10 +38,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
 
-        // On protège seulement l'admin
         if (!path.startsWith("/api/admin/")) return true;
 
-        // On laisse passer les endpoints publics
         return path.equals("/api/admin/auth/login")
                 || path.equals("/api/admin/auth/refresh")
                 || path.equals("/api/admin/auth/logout");
@@ -73,7 +72,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // ✅ admin unique : refuse si ce n’est pas l’email admin
         if (!user.getEmail().equalsIgnoreCase(adminProps.email())) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;

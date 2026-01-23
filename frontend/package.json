@@ -1,5 +1,5 @@
 {
-  "name": "smart-expense-tracker",
+  "name": "donation-platform",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:smart-expense-tracker": "node dist/smart-expense-tracker/server/server.mjs"
+    "serve:ssr:donation-platform": "node dist/donation-platform/server/server.mjs"
   },
   "prettier": {
     "printWidth": 100,

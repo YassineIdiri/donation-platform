@@ -1,111 +1,111 @@
 <div class="bg-gradient-to-br from-[#E0F7FA] via-[#F1F8E9] to-[#E8F5E9]">
-<div class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden font-sans selection:bg-emerald-200">
+  <div class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden font-sans selection:bg-emerald-200">
 
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-[-10%] left-[10%] w-[500px] h-[500px] bg-emerald-300/20 rounded-full blur-[100px]"></div>
-    <div class="absolute bottom-[-10%] right-[10%] w-[400px] h-[400px] bg-teal-300/20 rounded-full blur-[80px]"></div>
-  </div>
-
-  <main class="relative z-10 w-full max-w-md px-6 flex flex-col items-center">
-
-    <header class="text-center mb-10 animate-fade-in-down">
-      <h1 class="text-4xl font-extrabold text-emerald-950 tracking-tight mb-3">
-        {{ settings?.title ?? 'Faites un ' }}
-        <span class="text-emerald-600">impact</span>.
-      </h1>
-      <p class="text-emerald-700/80 text-base font-medium max-w-xs mx-auto leading-relaxed">
-        Soutenez notre mission. <br>100% sécurisé et transparent.
-      </p>
-    </header>
-
-    <div *ngIf="loading" class="text-emerald-900/70 font-medium">Chargement…</div>
-
-    <div *ngIf="error" class="w-full mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-      {{ error }}
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-[-10%] left-[10%] w-[500px] h-[500px] bg-emerald-300/20 rounded-full blur-[100px]"></div>
+      <div class="absolute bottom-[-10%] right-[10%] w-[400px] h-[400px] bg-teal-300/20 rounded-full blur-[80px]"></div>
     </div>
 
-    <div *ngIf="toast" class="w-full mb-4 text-sm text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
-      {{ toast }}
-    </div>
+    <main class="relative z-10 w-full max-w-md px-6 flex flex-col items-center">
 
-    <div class="relative w-full h-[340px] flex items-center justify-center" *ngIf="!loading">
+      <header class="text-center mb-10 animate-fade-in-down">
+        <h1 class="text-4xl font-extrabold text-emerald-950 tracking-tight mb-3">
+          {{ settings?.title ?? 'Make an ' }}
+        </h1>
+        <p class="text-emerald-700/80 text-base font-medium max-w-xs mx-auto leading-relaxed">
+          Support our mission. <br>100% secure and transparent.
+        </p>
+      </header>
 
-      <div class="glass-panel relative z-20 w-38 h-38 rounded-full flex flex-col items-center justify-center transition-all duration-300 group">
+      <div *ngIf="loading" class="text-emerald-900/70 font-medium">Loading…</div>
 
-        <span class="text-[10px] font-bold tracking-[0.2em] text-emerald-400 uppercase mb-1">
-          Je donne
-        </span>
-
-        <div class="flex items-center justify-center relative">
-          <input
-            type="number"
-            [ngModel]="currentAmount()"
-            (input)="onInputChange($event)"
-            placeholder="0"
-            class="w-20 bg-transparent text-center text-6xl font-extrabold text-emerald-900 placeholder-emerald-900/10 outline-none border-none p-0 leading-none z-10"
-          />
-          <span class="text-3xl font-medium text-emerald-500 absolute -right-4 top-2">€</span>
-        </div>
-
-        <p class="text-xs text-emerald-500/60 mb-4 font-medium">Montant libre</p>
-
-        <button
-          (click)="submitDonation()"
-          class="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-emerald-600 text-white py-2 rounded-full shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 hover:shadow-emerald-700/40 active:scale-95 transition-all flex items-center gap-3 whitespace-nowrap min-w-[220px] justify-center group-hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
-          [disabled]="paying"
-        >
-          <span class="font-bold text-lg">{{ ctaText() }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </button>
+      <div *ngIf="error" class="w-full mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+        {{ error }}
       </div>
 
-      <!-- BUBBLES : on mappe bubbleAmounts[0..4] -->
-      <button (click)="selectAmount(bubbleAmounts[0])"
-              class="bubble-item w-20 h-20 -top-2 left-4 float-anim" style="animation-delay: 0s;"
-              [class.active]="currentAmount() === bubbleAmounts[0]">
-        <span class="text-xl">{{ bubbleAmounts[0] }}€</span>
-      </button>
+      <div *ngIf="toast" class="w-full mb-4 text-sm text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+        {{ toast }}
+      </div>
 
-      <button (click)="selectAmount(bubbleAmounts[1])"
-              class="bubble-item w-24 h-24 top-0 right-2 float-anim" style="animation-delay: 1s;"
-              [class.active]="currentAmount() === bubbleAmounts[1]">
-        <span class="text-2xl">{{ bubbleAmounts[1] }}€</span>
-      </button>
+      <div class="relative w-full h-[340px] flex items-center justify-center" *ngIf="!loading">
 
-      <button (click)="selectAmount(bubbleAmounts[2])"
-              class="bubble-item w-16 h-16 top-1/2 -left-4 -translate-y-1/2 float-anim" style="animation-delay: 2s;"
-              [class.active]="currentAmount() === bubbleAmounts[2]">
-        <span class="text-lg">{{ bubbleAmounts[2] }}€</span>
-      </button>
+        <div class="glass-panel relative z-20 w-38 h-38 rounded-full flex flex-col items-center justify-center transition-all duration-300 group">
 
-      <button (click)="selectAmount(bubbleAmounts[3])"
-              class="bubble-item w-28 h-28 -bottom-12 -left-2 float-anim" style="animation-delay: 1.5s;"
-              [class.active]="currentAmount() === bubbleAmounts[3]">
-        <span class="text-3xl">{{ bubbleAmounts[3] }}€</span>
-      </button>
+        <span class="text-[10px] font-bold tracking-[0.2em] text-emerald-400 uppercase mb-1">
+          I donate
+        </span>
 
-      <button (click)="selectAmount(bubbleAmounts[4])"
-              class="bubble-item w-14 h-14 -bottom-4 right-0 float-anim" style="animation-delay: 0.5s;"
-              [class.active]="currentAmount() === bubbleAmounts[4]">
-        <span class="text-lg">{{ bubbleAmounts[4] }}€</span>
-      </button>
+          <div class="flex items-center justify-center relative">
+            <input
+              type="number"
+              [ngModel]="currentAmount()"
+              (input)="onInputChange($event)"
+              placeholder="0"
+              class="w-20 bg-transparent text-center text-4xl font-extrabold text-emerald-900 placeholder-emerald-900/10 outline-none border-none p-0 leading-none z-10"
+            />
+            <span class="text-3xl font-medium text-emerald-500 absolute -right-4 top-2">€</span>
+          </div>
 
-    </div>
+          <p class="text-xs text-emerald-500/60 mb-4 font-medium">Free amount</p>
 
-    <div class="mt-14 flex items-center gap-4 opacity-60 grayscale hover:grayscale-0 transition-all">
-      <div class="h-6 w-10 bg-emerald-900/20 rounded"></div>
-      <div class="h-6 w-10 bg-emerald-900/20 rounded"></div>
-      <div class="h-6 w-10 bg-emerald-900/20 rounded"></div>
-    </div>
+          <button
+            (click)="submitDonation()"
+            class="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-emerald-600 text-white py-2 rounded-full shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 hover:shadow-emerald-700/40 active:scale-95 transition-all flex items-center gap-3 whitespace-nowrap min-w-[220px] justify-center group-hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
+            [disabled]="paying"
+          >
+            <span class="font-bold text-lg">{{ ctaText() }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </button>
+        </div>
 
-    <footer class="mt-10 text-xs text-emerald-900/60 flex gap-4">
-      <a routerLink="/mentions-legales" class="hover:underline">Mentions</a>
-      <a routerLink="/confidentialite" class="hover:underline">Confidentialité</a>
-      <a routerLink="/contact" class="hover:underline">Contact</a>
-    </footer>
+        <!-- BUBBLES : on mappe bubbleAmounts[0..4] -->
+        <button (click)="selectAmount(bubbleAmounts[0])"
+                class="bubble-item w-20 h-20 -top-2 left-4 float-anim" style="animation-delay: 0s;"
+                [class.active]="currentAmount() === bubbleAmounts[0]">
+          <span class="text-xl">{{ bubbleAmounts[0] }}€</span>
+        </button>
 
-  </main>
-</div>
+        <button (click)="selectAmount(bubbleAmounts[1])"
+                class="bubble-item w-24 h-24 top-0 right-2 float-anim" style="animation-delay: 1s;"
+                [class.active]="currentAmount() === bubbleAmounts[1]">
+          <span class="text-2xl">{{ bubbleAmounts[1] }}€</span>
+        </button>
+
+        <button (click)="selectAmount(bubbleAmounts[2])"
+                class="bubble-item w-16 h-16 top-1/2 -left-4 -translate-y-1/2 float-anim" style="animation-delay: 2s;"
+                [class.active]="currentAmount() === bubbleAmounts[2]">
+          <span class="text-lg">{{ bubbleAmounts[2] }}€</span>
+        </button>
+
+        <button (click)="selectAmount(bubbleAmounts[3])"
+                class="bubble-item w-28 h-28 -bottom-12 -left-2 float-anim" style="animation-delay: 1.5s;"
+                [class.active]="currentAmount() === bubbleAmounts[3]">
+          <span class="text-3xl">{{ bubbleAmounts[3] }}€</span>
+        </button>
+
+        <button (click)="selectAmount(bubbleAmounts[4])"
+                class="bubble-item w-14 h-14 -bottom-4 right-0 float-anim" style="animation-delay: 0.5s;"
+                [class.active]="currentAmount() === bubbleAmounts[4]">
+          <span class="text-lg">{{ bubbleAmounts[4] }}€</span>
+        </button>
+
+      </div>
+
+      <div class="mt-14 flex items-center gap-4 opacity-60 grayscale hover:grayscale-0 transition-all">
+        <div class="h-6 w-10 bg-emerald-900/20 rounded"></div>
+        <div class="h-6 w-10 bg-emerald-900/20 rounded"></div>
+        <div class="h-6 w-10 bg-emerald-900/20 rounded"></div>
+      </div>
+
+      <footer class="mt-10 text-xs text-emerald-900/60 flex gap-4">
+        <a routerLink="/mentions-legales" class="hover:underline">Legal</a>
+        <a routerLink="/confidentialite" class="hover:underline">Privacy</a>
+        <a routerLink="/contact" class="hover:underline">Contact</a>
+        <a routerLink="/admin/login" class="hover:underline">Admin</a>
+      </footer>
+
+    </main>
+  </div>
 </div>

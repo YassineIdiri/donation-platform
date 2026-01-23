@@ -4,8 +4,7 @@ import { environment } from '../../../environments/environment';
 
 export type PublicUiSettings = {
   title: string;
-  primaryColor: string;      // "#22C55E"
-  suggestedAmounts: number[]; // [5, 20, 30, 50, 100]
+  suggestedAmounts: number[];
 };
 
 @Injectable({ providedIn: 'root' })

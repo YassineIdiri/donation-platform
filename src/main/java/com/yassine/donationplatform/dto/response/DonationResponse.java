@@ -1,6 +1,6 @@
 package com.yassine.donationplatform.dto.response;
 
-import com.yassine.donationplatform.domain.donation.DonationStatus;
+import com.yassine.donationplatform.dto.DonationStatus;
 
 import java.time.Instant;
 import java.util.UUID;
