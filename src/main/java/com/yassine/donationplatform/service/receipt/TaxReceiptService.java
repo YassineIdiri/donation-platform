@@ -160,12 +160,20 @@ public class TaxReceiptService {
     }
 
     private Path ensurePdf(TaxReceipt receipt, Donation donation) {
-        if (receipt.getPdfPath() != null && !receipt.getPdfPath().isBlank()) {
-            Path candidate = Path.of(receipt.getPdfPath());
-            if (Files.exists(candidate)) return candidate;
+        String existing = receipt.getPdfPath();
+        if (existing != null && !existing.isBlank()) {
+            try {
+                Path candidate = Path.of(existing).normalize().toAbsolutePath();
+                if (Files.exists(candidate) && Files.isRegularFile(candidate)) {
+                    return candidate;
+                }
+            } catch (Exception ignored) {
+            }
         }
+
         return pdfService.generatePdf(receipt, donation);
     }
+
 
     private static String safeFileReceiptNumber(TaxReceipt receipt) {
         if (receipt.getReceiptNumber() != null) {
