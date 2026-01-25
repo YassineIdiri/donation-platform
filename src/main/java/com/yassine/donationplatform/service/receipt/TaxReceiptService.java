@@ -21,12 +21,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.UUID;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class TaxReceiptService {
 
     @PersistenceContext
     private EntityManager em;
+
+    private static final Logger log = LoggerFactory.getLogger(TaxReceiptService.class);
 
     private final DonationService donationService;
     private final TaxReceiptRepository receiptRepo;
@@ -72,9 +75,11 @@ public class TaxReceiptService {
         em.refresh(saved);
 
         try {
+            log.info("Receipt: generating PDF donationId={}", donationId);
             Path pdfPath = ensurePdf(saved, donation);
+            log.info("Receipt: PDF ready at {}", pdfPath);
             emailService.sendReceipt(saved, pdfPath);
-
+            log.info("Receipt: email sent");
             saved.setStatus(TaxReceiptStatus.ISSUED);
             if (saved.getIssuedAt() == null) saved.setIssuedAt(Instant.now());
             saved.setPdfPath(pdfPath.toString());
@@ -83,6 +88,7 @@ public class TaxReceiptService {
             return toResponse(issued);
 
         } catch (Exception e) {
+            log.error("Receipt: FAILED donationId={}", donationId, e);
             saved.setStatus(TaxReceiptStatus.FAILED);
             receiptRepo.save(saved);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to issue receipt");
