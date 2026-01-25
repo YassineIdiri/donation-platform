@@ -1,6 +1,8 @@
+[![CI](https://github.com/YassineIdiri/donation-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/YassineIdiri/donation-platform/actions/workflows/ci.yml)
+
+
 # Donation Platform — Full-Stack (Spring Boot + Angular)
 
-[![CI](https://github.com/YassineIdiri/donation-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/YassineIdiri/donation-platform/actions/workflows/ci.yml)
 
 A production-ready donation platform featuring Stripe payments, a secure admin back-office, automated CI, PDF tax receipts, and a clean Angular front-end. Built with a strong focus on **security**, **developer experience**, and **real-world deployment constraints** (cloud hosting, env configs, CI pipelines).
 
